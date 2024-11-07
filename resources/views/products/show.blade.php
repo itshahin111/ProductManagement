@@ -12,7 +12,6 @@
                 <p><strong>Price:</strong> ${{ number_format($product->price, 2) }}</p>
                 <p><strong>Stock:</strong> {{ $product->stock ?? 'N/A' }}</p>
 
-                <!-- Display Image if available -->
                 @if ($product->image)
                     <p><strong>Image:</strong></p>
                     <img src="{{ asset('images/' . $product->image) }}" width="100px">

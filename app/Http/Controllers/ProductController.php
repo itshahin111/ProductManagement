@@ -86,7 +86,6 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
 
-    // Extracted image upload logic to reduce code repetition
     private function uploadImage(Request $request)
     {
         if ($image = $request->file('image')) {
