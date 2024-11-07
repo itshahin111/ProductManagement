@@ -35,11 +35,15 @@ class ProductController extends Controller
             'product_id' => 'required|unique:products',
             'name' => 'required',
             'price' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        Product::create($request->all());
+        $input = $request->all();
+        $input['image'] = $this->uploadImage($request);
 
-        return redirect()->route('products.index');
+        Product::create($input);
+
+        return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
     public function show($id)
@@ -60,12 +64,18 @@ class ProductController extends Controller
             'product_id' => 'required|unique:products,product_id,' . $id,
             'name' => 'required',
             'price' => 'required|numeric',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $product = Product::findOrFail($id);
-        $product->update($request->all());
+        $input = $request->all();
+        if ($request->hasFile('image')) {
+            $input['image'] = $this->uploadImage($request);
+        }
 
-        return redirect()->route('products.index');
+        $product = Product::findOrFail($id);
+        $product->update($input);
+
+        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }
 
     public function destroy($id)
@@ -73,6 +83,19 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return redirect()->route('products.index');
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+    }
+
+    // Extracted image upload logic to reduce code repetition
+    private function uploadImage(Request $request)
+    {
+        if ($image = $request->file('image')) {
+            $destinationPath = 'images/';
+            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+            $image->move($destinationPath, $profileImage);
+            return $profileImage;
+        }
+
+        return null;
     }
 }
